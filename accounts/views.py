@@ -4,7 +4,7 @@ from .forms import UserForm
 from .models import User, userProfile
 from django.contrib import messages, auth
 from vendor.forms import *
-from .utils import detectUser
+from .utils import *
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import PermissionDenied
 
@@ -51,6 +51,9 @@ def registerUser(request):
                                             password=password)
             user.role = User.CUSTOMER
             user.save()
+
+            send_verification_email(request, user)
+
             messages.success(request, 'Your account has been  registered successfully!')
             return redirect('registerUser')
     else:
