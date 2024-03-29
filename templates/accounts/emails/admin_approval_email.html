@@ -1,0 +1,12 @@
+{% autoescape off %}
+
+hi {{user.first_name}},
+
+{% if is_approved %}
+Congratulations! Your restaurant has been approved by our admin team.
+{% else %}
+We're Sorry! Your restaurant is not approved for foodOnline Marketplace
+{% endif %}
+
+
+{% endautoescape %} 
