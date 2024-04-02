@@ -33,7 +33,14 @@
                                         <a href="{% url 'fooditems_by_category' food.id %}"><p class="mb-0 font-weight-bold">{{ food }}</p>
                                         <small class="text-muted">{{ food.description }}</small></a>
                                         </td>
-                                    <td>Edit Delete</td>
+                                    <td>
+                                        {% if food.is_available %}
+                                        <span class='badge badge-success'>Available</span>
+                                        {% else %}
+                                        <span class='badge badge-danger'>Not Available</span>
+                                        {% endif %}
+                                    </td>
+                                    <td><a href='{% url 'edit_food' food.id %}'>Edit</a> <a href='{% url 'delete_food' food.id %}'>Delete</a></td>
                                   </tr>
                                 {% endfor %}
                                 </tbody>
