@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
+
 {% block content %}
 <!-- Main Section Start -->
 {% comment %} <div class="main-section">
@@ -229,15 +230,18 @@
                                                         <div class="price-holder">
                                                             <span class="price">${{food.price}}</span>
                                                             <a href="#" class="decrease_cart" style='margin-right: 28px;' ><i class="icon-minus text-color"></i></a>
-                                                            <label id='qty'>0</label>
-                                                            <a href="#" class="add_to_cart"><i class="icon-plus4 text-color"></i></a>
+                                                            {%%}
+                                                            <label id='qty-{{food.id}}'>0</label>
+                                                            <a href="{% url 'add_to_cart' food.id %}" class="add_to_cart"><i class="icon-plus4 text-color"></i></a>
                                                             
                                                         </div>
                                                     </li>
                                                 {% endfor %}
                                             {% endfor %}
                                         </ul>
-                                    
+                                    {% for item in cart_items %}
+                                    <span>{{ item.quantity }}</span>
+                                    {% endfor %}
                                         
                                     </div>
                                 </div>
@@ -252,4 +256,39 @@
     </div>
 </div>
 
+
+
+
+
+
 {% endblock %}
+
+{% comment %} <script>
+    $(document).ready(function(){
+        $('.add_to_cart').on('click', function(e){
+            e.preventDefault();
+
+            food_id = $(this).attr('data-id');
+            url = $(this).attr('data-url')
+
+            data = {
+                food_id : food_id,
+            }
+            $.ajax({
+                type: 'GET',
+                url: url,
+                data: data,
+                success: function(response){
+                    console.log(response)
+                }
+            })
+        });
+
+        $('.item_qty').each(function(){
+            var the_id = $(this).attr('id')
+            var qty = $(this).attr('data-qty')
+            $('#'+the_id).html(qty)
+        })
+    });
+</script>   
+{% comment %} {% endblock %}  {% endcomment %}
