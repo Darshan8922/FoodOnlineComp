@@ -216,11 +216,7 @@
                                             <span>{{category.description}}</span>
                                         </div>
                                         <ul>
-                                            
                                                 {% for food in category.fooditems.all  %}
-                                                
-                                            
-                                                
                                                     <li>
                                                         <div class="image-holder"> <img src="{{ food.image.url }}" alt=""></div>
                                                         <div class="text-holder">  
@@ -229,11 +225,9 @@
                                                         </div>
                                                         <div class="price-holder">
                                                             <span class="price">${{food.price}}</span>
-                                                            <a href="#" class="decrease_cart" style='margin-right: 28px;' ><i class="icon-minus text-color"></i></a>
-                                                            {%%}
-                                                            <label id='qty-{{food.id}}'>0</label>
-                                                            <a href="{% url 'add_to_cart' food.id %}" class="add_to_cart"><i class="icon-plus4 text-color"></i></a>
-                                                            
+                                                            <a href="{% url 'decrease_cart' food.id %}" class="decrease_cart" style='margin-right: 28px;' ><i class="icon-minus text-color"></i></a>
+                                                            <label id='qty-{{food.id}}'>{{ food.quantity_in_cart }}</label>
+                                                            <a href="{% url 'add_to_cart' food.id %}" class="add_to_cart"><i class="icon-plus4 text-color"></i></a>         
                                                         </div>
                                                     </li>
                                                 {% endfor %}
