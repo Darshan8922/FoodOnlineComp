@@ -5,6 +5,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Prefetch
 from django.http import HttpResponse, JsonResponse
 from .models import Cart
+from django.contrib.auth.decorators import login_required
+
 # Create your views here.
 def marketplace(request):
     vendors = Vendor.objects.filter(is_approved=True, user__is_active=True)[:8]
@@ -14,8 +16,6 @@ def marketplace(request):
         'vendor_count': vendor_count,
     }
     return render(request, 'marketplace/listings.html', context)
-
-
 
 def vendor_detail(request, vendor_slug):
     vendor = get_object_or_404(Vendor, vendor_slug=vendor_slug)
@@ -94,7 +94,7 @@ def add_to_cart(request, food_id=None):
             chkCart.save()
             vendor_slug = fooditem.vendor.vendor_slug
         # Redirect to the vendor_detail view with the appropriate vendor_slug
-            return redirect('vendor_detail', vendor_slug=vendor_slug)
+            return redirect(request.META.get('HTTP_REFERER', '/'))
         except:
             chkCart = Cart.objects.create(user= request.user, fooditem=fooditem, quantity=1)
             vendor_slug = fooditem.vendor.vendor_slug
@@ -120,11 +120,27 @@ def decrease_cart(request, food_id = None):
             pass  # No action needed if item is not in the cart
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
+
+@login_required(login_url = 'login')
 def cart(request):
     cart_items = None
     if request.user.is_authenticated:
-        cart_items = Cart.objects.filter(user=request.user).select_related('fooditem')
+        cart_items = Cart.objects.filter(user=request.user).order_by('created_at')
+
+    subtotal = 0
+    tax = 0
+    for item in cart_items:
+        subtotal += item.fooditem.price * item.quantity
+    
+    total = 0
+    total = subtotal + tax
     context = {
-        'cart_items': cart_items
+        'cart_items': cart_items,
+        'subtotal' : subtotal,
+        'total' : total,
     }
     return render(request, 'marketplace/cart.html', context)
+
+
+def search(request):
+    return HttpResponse('search page')
