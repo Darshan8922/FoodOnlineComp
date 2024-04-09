@@ -18,24 +18,25 @@
                         <div class="user-holder">
                             <h5 class='text-uppercase'>Opening Hours</h5>
                             <hr>
-                            {% for hour in opening_hours %}
-                                {{ hour }} {{ hour.from_hour }} {{ hour.to_hour }}
-                            {% endfor %}    
+                            {% if data %}
+                                <table class="table opening_hours" style="width: 500px; border: none !important;">
+                                    <tbody>
+                                        {% for hour in data %}
+                                            <tr>
+                                                <td><b>{{ hour }}</b></td>
+                                                <td>{% if hour.is_closed %}Closed{% else %}{{ hour.from_hour }} - {{ hour.to_hour }}{% endif %}</td>
+                                                <td><a href="{% url 'remove_hours' hour.id %}"> Remove </a></td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            {% else %}
+                                <p>No opening hours available</p>
+                            {% endif %}
                             <br>
-                            <table class="table opening_hours" style="width: 500px; border: none ! important;">
-                                <tbody>
-                                    {% for hour in opening_hours %}
-                                    <tr>
-                                        <td><b>{{ hour }}</b></td>
-                                        <td>{% if hour.is_closed %}Closed{% else %}{{ hour.from_hour }} - {{ hour.to_hour}} {% endif %}</td>
-                                        <td><a href="#"> Remove </a></td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
                             <br>
-                            <br>
-                            <form id="opening_hours">
+                            <form action="{% url 'add_opening_hours' %}" id="opening_hours" method="post">
+                                {% csrf_token %}
                                 <div class="row">
                                     <div class="col-md-2">
                                         {{ form.day }}
@@ -52,8 +53,12 @@
                                     <div class="col-md-2">
                                         <button class="btn btn-success">Add Hours</button>
                                     </div>
+                                </div>
+                            </form>
+                            
                         </div>
-                </div>
+                    </div>
+                    
             </div>
         </div>
     </div>

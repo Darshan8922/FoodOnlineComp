@@ -6,6 +6,9 @@ from django.db.models import Prefetch
 from django.http import HttpResponse, JsonResponse
 from .models import Cart
 from django.contrib.auth.decorators import login_required
+from datetime import date, datetime
+from vendor.models import OpeningHour
+
 
 # Create your views here.
 def marketplace(request):
@@ -25,6 +28,28 @@ def vendor_detail(request, vendor_slug):
             queryset=FoodItem.objects.filter(is_available=True)
         )
     )
+    opening_hours = OpeningHour.objects.filter(vendor=vendor).order_by('day', '-from_hour')
+
+    #Check Current Days's opening hours
+    today_date = date.today()
+    today = today_date.isoweekday()
+
+    current_opening_hours = OpeningHour.objects.filter(vendor=vendor, day=today)
+    now = datetime.now()
+    current_time = now.strftime("%H:%M:%S")
+    
+    is_open = None
+    for i in current_opening_hours:
+        start = str(datetime.strptime(i.from_hour, "%I:%M %p").time())
+        end = str(datetime.strptime(i.to_hour, "%I:%M %p").time())
+
+        if current_time > start and current_time < end:
+            is_open = True
+        else:
+            is_open = False
+
+        print(start, end)
+        
 
     cart_items = None
     need_login = False
@@ -41,12 +66,14 @@ def vendor_detail(request, vendor_slug):
             else:
                 # If user is not logged in, set quantity_in_cart to 0 for all items
                 fooditem.quantity_in_cart = 0
-
+    now = datetime.now()
+    print(now)
     context = {
         'vendor': vendor,
         'categories': categories,
         'cart_items': cart_items,
-        'need_login': need_login
+        'need_login': need_login,
+        'is_open': is_open,
     }
     return render(request, 'marketplace/vendor_detail.html', context)
 

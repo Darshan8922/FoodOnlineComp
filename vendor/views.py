@@ -9,6 +9,7 @@ from accounts.views import check_role_vendor
 from menu.models import *
 from menu.forms import *
 from django.template.defaultfilters import slugify
+from django.http import HttpResponse
 
 # Create your views here.
 
@@ -191,3 +192,51 @@ def opening_hours(request):
         'opening_hours': opening_hours,
     }
     return render(request, 'vendor/opening_hours.html', context)
+def add_opening_hours(request):
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+            
+            form = OpeningHourForm(request.POST)
+            if form.is_valid():
+                if OpeningHour.objects.filter(vendor=get_vendor(request), day=form.cleaned_data['day']).exists():
+                    messages.warning(request, "The Day is already exists remove it to add new Timmings!")
+                    return redirect(request.META.get('HTTP_REFERER', '/')) 
+                opening_hour = form.save(commit=False) 
+                opening_hour.vendor = get_vendor(request) 
+                opening_hour.save()  
+
+                messages.success(request, "Opening hours added successfully!")
+                return redirect(request.META.get('HTTP_REFERER', '/')) 
+            else:
+
+                messages.error(request, "Please correct the errors below.")
+        else:
+
+            form = OpeningHourForm()
+        data = OpeningHour.objects.filter(vendor=get_vendor(request))
+        context = {
+            'form': form,
+            'data': data,
+        }
+        return render(request, 'vendor/opening_hours.html', context)
+    else:
+        return redirect('login')
+
+
+from django.http import HttpResponseServerError
+
+def remove_hours(request, id):
+    try:
+        # Get the opening hour instance
+        hour_instance = OpeningHour.objects.get(id=id)
+        
+        # Delete the opening hour instance
+        hour_instance.delete()
+        
+        return redirect(request.META.get('HTTP_REFERER', '/'))
+    except OpeningHour.DoesNotExist:
+        return HttpResponseServerError("Opening hour instance does not exist.")
+    except Exception as e:
+        return HttpResponseServerError(f"An error occurred: {str(e)}")
+
+
