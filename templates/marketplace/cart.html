@@ -64,13 +64,18 @@
                                                     <span id="subtotal">{{ subtotal }}</span>
                                                 </span>
                                             </li>
-                                            <li style="list-style-type: none;">
-                                                Tax
-                                                <span class="price float-right">
-                                                    <span class="currency">$</span>
-                                                    <span id="tax">0</span>
-                                                </span>
-                                            </li>
+                                            {% for key, value in tax_dict.items %}
+    {% for tax_percentage, tax_amount in value.items %}
+        <li style="list-style-type: none;">
+            {{ key }} <small> ({{ tax_percentage }}%) </small>
+            <span class="price float-right">
+                <span class="currency">$</span>
+                <span id="tax">{{ tax_amount }}</span>
+            </span>
+        </li>
+    {% endfor %}
+{% endfor %}
+
                                             <li style="list-style-type: none;">
                                                 <strong>
                                                 Total
@@ -79,6 +84,7 @@
                                                     <span id="total">{{ total }}</span>
                                                 </span></strong>
                                             </li>
+                                            <a href="{% url 'checkout' %}" class='btn btn-danger w-100 mt-3'>PROCEED TO CHECKOUT</a>
                                         </ul>
                                     </div>
                                 </div>

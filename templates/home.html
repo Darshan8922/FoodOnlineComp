@@ -151,9 +151,15 @@
 														<img src="{% static 'images/default-profile.png' %}" class='img-thumb wp-post-image' alt=""> 
 														{% endif %}
 												</figure>
+												{% if vendor.is_open %}
+												<span class="restaurant-status Open">
+													<em class="bookmarkRibbon"></em>Open
+												</span>
+												{% else %}
 												<span class="restaurant-status close">
 													<em class="bookmarkRibbon"></em>Close
 												</span>
+												{% endif %}
 											</div>
 											<div class="text-holder">
 												<div class="post-title">
@@ -168,11 +174,6 @@
 											{% endfor %}
 										</div>
 									</li>
-
-
-
-
-									
 								</ul>
 							</div>
 						</div>

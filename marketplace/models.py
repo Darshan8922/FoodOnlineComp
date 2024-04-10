@@ -12,3 +12,11 @@ class Cart(models.Model):
 
     def __unicode__(self):
         return self.user
+
+class Tax(models.Model):
+    tax_type = models.CharField(max_length=20, unique=True)
+    tax_percentage = models.DecimalField(verbose_name='Tax Percentage (%)', max_digits=4, decimal_places=2)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.tax_type

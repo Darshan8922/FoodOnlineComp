@@ -4,7 +4,7 @@ from menu.models import *
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Prefetch
 from django.http import HttpResponse, JsonResponse
-from .models import Cart
+from .models import Cart, Tax
 from django.contrib.auth.decorators import login_required
 from datetime import date, datetime
 from vendor.models import OpeningHour
@@ -35,21 +35,6 @@ def vendor_detail(request, vendor_slug):
     today = today_date.isoweekday()
 
     current_opening_hours = OpeningHour.objects.filter(vendor=vendor, day=today)
-    now = datetime.now()
-    current_time = now.strftime("%H:%M:%S")
-    
-    is_open = None
-    for i in current_opening_hours:
-        start = str(datetime.strptime(i.from_hour, "%I:%M %p").time())
-        end = str(datetime.strptime(i.to_hour, "%I:%M %p").time())
-
-        if current_time > start and current_time < end:
-            is_open = True
-        else:
-            is_open = False
-
-        print(start, end)
-        
 
     cart_items = None
     need_login = False
@@ -73,7 +58,6 @@ def vendor_detail(request, vendor_slug):
         'categories': categories,
         'cart_items': cart_items,
         'need_login': need_login,
-        'is_open': is_open,
     }
     return render(request, 'marketplace/vendor_detail.html', context)
 
@@ -148,26 +132,40 @@ def decrease_cart(request, food_id = None):
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
 
-@login_required(login_url = 'login')
+@login_required(login_url='login')
 def cart(request):
     cart_items = None
+    
     if request.user.is_authenticated:
         cart_items = Cart.objects.filter(user=request.user).order_by('created_at')
 
     subtotal = 0
     tax = 0
+    tax_dict = {}
+
     for item in cart_items:
         subtotal += item.fooditem.price * item.quantity
     
-    total = 0
-    total = subtotal + tax
+    get_tax = Tax.objects.filter(is_active=True)
+    for tax in get_tax:
+        tax_type = tax.tax_type
+        tax_percentage = tax.tax_percentage
+        tax_amount = round((tax_percentage * subtotal) / 100, 2)
+        tax_dict[tax_type] = {tax_percentage: tax_amount}
+
+    total = subtotal + sum(sum(tax_dict[tax_type].values()) for tax_type in tax_dict.keys())
+
     context = {
         'cart_items': cart_items,
-        'subtotal' : subtotal,
-        'total' : total,
+        'subtotal': subtotal,
+        'total': total,
+        'tax_dict': tax_dict,
     }
     return render(request, 'marketplace/cart.html', context)
 
 
 def search(request):
     return HttpResponse('search page')
+
+def checkout(request):
+    return render(request, 'marketplace/checkout.html')
