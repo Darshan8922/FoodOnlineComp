@@ -8,6 +8,7 @@ from .models import Cart, Tax
 from django.contrib.auth.decorators import login_required
 from datetime import date, datetime
 from vendor.models import OpeningHour
+from orders.forms import OrderForm
 
 
 # Create your views here.
@@ -168,4 +169,8 @@ def search(request):
     return HttpResponse('search page')
 
 def checkout(request):
-    return render(request, 'marketplace/checkout.html')
+    form = OrderForm()
+    context = {
+        'form': form,
+    }
+    return render(request, 'marketplace/checkout.html', context)
