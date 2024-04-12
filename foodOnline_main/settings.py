@@ -29,7 +29,14 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', cast=bool)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "django-render-example-app.onrender.com",
+    "localhost",
+    "rest-71by.onrender.com",
+    "rest-pmy6.onrender.com",
+    ".onrender.com", 
+    "127.0.0.1:8000",
+]
 
 
 # Application definition
