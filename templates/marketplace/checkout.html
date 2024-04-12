@@ -14,6 +14,7 @@
                         <div class="tab-content">
                             <div id="home" class="tab-pane in active">
                                 <div class="menu-itam-holder">
+                                
                                     
                                     <div id="menu-item-list-6272" class="menu-itam-list">
                                         <form action="{% url 'checkout' %}" method = "POST">
@@ -77,6 +78,29 @@
                         <div class="tab-content">
                             <div id="home" class="tab-pane in active">
                                 <div class="menu-itam-holder">
+                                    <div id="menu-item-list-6272" class="menu-itam-list">
+                                        <ul>
+                                            {% if cart_items %}
+                                                {% for item in cart_items %}
+                                                    <li>
+                                                        <div class="image-holder"> <img src="{{ item.fooditem.image.url }}" alt=""></div>
+                                                        <div class="text-holder">  
+                                                            <h6>{{ item.fooditem }}</h6>
+                                                            <span>{{ item.fooditem.description }}</span>
+                                                            <a href="{% url 'vendor_detail' item.fooditem.vendor.vendor_slug %}" class="badge badge-warning">{{ item.fooditem.vendor }}</a>
+                                                        </div>
+                                                        <div class="quantity"><span>{{item.quantity}}</span>Qty</div>
+                                                        <div class="price-holder">
+                                                            <span class="price">${{ item.fooditem.price }}</span>
+                                                            
+                                                        </div>
+                                                    </li>
+                                                {% endfor %}
+                                            {% else %}
+                                                <h4 style="color: red;">Cart is Empty !</h4>
+                                            {% endif %}
+                                        </ul>
+                                    </div>
                                     <div>
                                         <ul>
                                             <li style="list-style-type: none;">

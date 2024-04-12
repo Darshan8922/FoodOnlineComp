@@ -9,6 +9,7 @@ from django.contrib.auth.decorators import login_required
 from datetime import date, datetime
 from vendor.models import OpeningHour
 from orders.forms import OrderForm
+from accounts.models import userProfile
 
 
 # Create your views here.
@@ -168,9 +169,28 @@ def cart(request):
 def search(request):
     return HttpResponse('search page')
 
+@login_required(login_url='login')
 def checkout(request):
-    form = OrderForm()
+    cart_items = Cart.objects.filter(user=request.user).order_by('created_at')
+    cart_count = cart_items.count()
+    if cart_count <= 0:
+        return redirect('marketplace')
+
+    user_profile = userProfile.objects.get(user=request.user)
+    default_values = {
+        'first_name': request.user.first_name,
+        'last_name': request.user.last_name,
+        'phone': request.user.phone_number,
+        # 'address': request.user.address,
+        # 'country': request.user.country,
+        # 'state': request.user.state,
+        # 'city': request.user.city,
+        # 'pin_code': request.user.pin_code, 
+    }
+
+    form = OrderForm(initial=default_values)
     context = {
         'form': form,
+        'cart_items': cart_items,
     }
     return render(request, 'marketplace/checkout.html', context)
